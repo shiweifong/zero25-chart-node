@@ -1,0 +1,1 @@
+mEvent = _require('/models/event');
