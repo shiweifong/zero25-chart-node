@@ -86,27 +86,27 @@ module.exports = {
         , publishableKey : null
     }
     , pushNotification : {
-        gcmApiKey : 'AIzaSyDb_gIJVWBEWmJLZ-n83b5oAXHe-8M9mf4'
+        gcmApiKey : ''
         , up : {
-            apnsCert : __root + '/keys/lifecare.pem'
-            , apnsKey : __root + '/keys/lifecare.pem'
+            apnsCert : __root + ''
+            , apnsKey : __root + ''
             , apnsProduction : true
-            , apnsPassphrase : 'astralink'
+            , apnsPassphrase : ''
         }
     }
     , redis : {
-        host : 'redis-18406.c1.ap-southeast-1-1.ec2.cloud.redislabs.com'
-        , port : 18406
-        , ttl : 120
-        , password : 'Nk4BumpPW4Eh4lhnCHxgOQTHfceJXrK7'
+        host : ''
+        , port : null
+        , ttl : null
+        , password : ''
     }
     , mongo : {
-        db : 'up'
-        , dbUser : 'shiweifong'
-        , password : 's8944896d'
-        , replicaSet : 'up-shard-0'
+        db : 'zero2-5'
+        , dbUser : 'zero25admin'
+        , password : 'r6xsQ5GUY68AJXj8'
+        , replicaSet : 'zero2-5-shard-0'
         , secured : true
-        , host : 'up-shard-00-00-srthe.gcp.mongodb.net:27017,' + 'up-shard-00-01-srthe.gcp.mongodb.net:27017,' + 'up-shard-00-02-srthe.gcp.mongodb.net:27017'
+        , host : 'zero2-5-shard-00-00-kvbng.mongodb.net:27017,' + 'zero2-5-shard-00-01-kvbng.mongodb.net:27017,' + 'zero2-5-shard-00-02-kvbng.mongodb.net:27017'
         , authSource : 'admin'
         , mongoDbConfig : {}
     }

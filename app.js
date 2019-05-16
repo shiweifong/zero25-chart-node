@@ -13,6 +13,7 @@ _require = function(name) {
 
 __root = __dirname;
 _ = require('underscore');
+fs = require('fs');
 lodash = require('lodash');
 config = require('./config');
 async = require('async');
@@ -121,7 +122,6 @@ app.use(express.static(path.join(__dirname, 'public')));
  */
 // Web Pages
 app.get('/', routes.index);
-app.get('/home', routes.home);
 
 // APIs
 app.get('/mcore/:base/:api', mcore);

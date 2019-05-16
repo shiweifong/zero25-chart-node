@@ -19,18 +19,8 @@
 // Authorized - Public Only (Main Page, require all user's access)
 exports.index = function(req, res){
     res.render('index', {
-        title: 'UP Technology'
+        title: 'Negative Air Ions Monitoring'
         , viewClass: 'landing'
         , ngController: 'landingController'
-    });
-};
-
-
-
-exports.home = function(req, res){
-    res.render('home', {
-        title: 'UP Technology'
-        , viewClass: 'home'
-        , ngController: 'homeController'
     });
 };
