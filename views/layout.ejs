@@ -4,16 +4,29 @@
   <base href="/">
     <title><%= title %></title>
 
-      <!--Bootstrap-->
-      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!--Jquery-->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 
-      <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+      <!--Bootstrap-->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+
 
       <!--Angular Modules-->
       <script type="text/javascript" src="https://cdn.jsdelivr.net/angularjs/1.5.0/angular.min.js"></script>
       <script type="text/javascript" src="https://cdn.jsdelivr.net/angularjs/1.5.0/angular-route.min.js"></script>
 
+      <!--Moment-->
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
+
+
+    <!--Date Time Picker-->
+    <script src="https://cdn.jsdelivr.net/npm/eonasdan-bootstrap-datetimepicker@4.17.47/src/js/bootstrap-datetimepicker.min.js"></script>
+
+    <!--Underscore-->
+    <script src="https://cdn.jsdelivr.net/npm/underscore@1.9.1/underscore.min.js"></script>
 
       <!-- Resources -->
       <script src="https://www.amcharts.com/lib/4/core.js"></script>
@@ -24,9 +37,39 @@
       <script type="text/javascript" src="/js/controller/landingController.js"></script>
       <script type="text/javascript" src="/js/app.js"></script>
 
+    <style type="text/css">
+      .navbar{
+        background-color:#ffffff;
+        border-radius:0px;
+        border-bottom:4px solid #02bab5;
+      }
+      .brand-image{
+        height:50px;
+      }
+
+      .navbar-brand{
+        height:auto;
+      }
+    </style>
+
   </head>
 
 <body class="<%= viewClass %>"  ng-controller="<%= ngController %>" ng-cloak>
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#"><img class="brand-image" src="/img/zero25logo.png" /></a>
+    </div>
+  </div><!-- /.container-fluid -->
+</nav>
+
     <%- body %>
 </body>
 

@@ -1,5 +1,5 @@
 {
-  "name": "zero25-chart-node",
+  "name": "zero25-node",
   "version": "0.0.1",
   "private": true,
   "main": "app.js",
@@ -8,7 +8,7 @@
   },
   "author": "sw",
   "license": "",
-  "description": "charting tool zero2-5",
+  "description": "zero2-5",
   "repository": {
     "type": "git",
     "url": ""

@@ -36,11 +36,28 @@ function concatFilesFromDirectory(dirname, returnedContent, onError) {
 
 // Generic get method for event
 // Authorized - Admin, System Admin
+var getAirIonData = exports.getAirIonData = function(req, res, override, callback, apiOptions){
+    eventController.getEvent(req, res, true, function(resGetEventDataErr, resGetEventData, resGetEventDataRowsReturned, resGetEventDataTotalRows){
+        if (!resGetEventDataErr && resGetEventDataRowsReturned){
+            apiHelper.getRes(req, res, null, resGetEventData, resGetEventDataTotalRows, callback);
+        }else{
+            apiHelper.getRes(req, res, resGetEventDataErr, null, null, callback);
+        }
+    });
+};
+
+// Generic get method for event
+// Authorized - Admin, System Admin
 var syncEventsFromDirectory= exports.syncEventsFromDirectory = function(req, res, override, callback, apiOptions){
-    var filesContent = "";
-    var parsedData = [];
-    var groupedData = {};
-    var averageData = [];
+    var filesContent = ""
+        , parsedData = []
+        , groupedData = {}
+        , deviceId = "5ce2360dc09bea9959745479"
+        , averageData = []
+        , error = false
+        , errorDesc
+        , errorCode;
+
 
     async.waterfall([
         function(readDataDir){
@@ -96,14 +113,11 @@ var syncEventsFromDirectory= exports.syncEventsFromDirectory = function(req, res
             parseRawFilesCb();
         }
         ,function(groupParsedData){
-            console.log('Grouping By Day')
 
             // group by day
             var dayGroup = _.groupBy(parsedData, 'day');
 
             // loop through day and group by hour
-            console.log('Grouping By Hour')
-            var hourGroup = {};
             _.map(dayGroup, function(val, key){
                 groupedData[key] = _.groupBy(val, 'hour');
             })
@@ -143,7 +157,7 @@ var syncEventsFromDirectory= exports.syncEventsFromDirectory = function(req, res
                             minutes = 45
                         }
 
-                        var avgDate = moment({ year :qYear, month :qMonth, day :qDay, hour :quarterData.hour, minute :minutes}).toISOString();
+                        var avgDate = moment({ year :qYear, month :qMonth, day :qDay, hour :hour, minute :minutes}).toISOString();
 
                         var averageDataObj = {
                             "ion_count_average" : qDataAvg,
@@ -157,7 +171,82 @@ var syncEventsFromDirectory= exports.syncEventsFromDirectory = function(req, res
             calculateAverage();
         }
         , function(syncWithDatabase){
-            syncWithDatabase();
+            // loop through each data, prep them and sync with database
+            async.eachSeries(averageData, function(eventData, eventDataSync){
+
+                var eventExists = false;
+                var eventId = null;
+                async.waterfall([
+                    function(checkIfEventExists) {
+                        var getEventReq = _.clone(req);
+                        getEventReq.query = {};
+                        getEventReq.query.CreateDate = moment(eventData.date).toISOString();
+                        eventController.getEvent(getEventReq, res, true, function (err, data, dataLength) {
+                                if (!err) {
+                                    if (dataLength) {
+                                        eventExists = true;
+                                        eventId = _.first(data)._id;
+                                    }else{
+                                        eventExists = false;
+                                    }
+                                    checkIfEventExists();
+                                }else{
+                                    checkIfEventExists(err);
+                                }
+                            });
+                    }
+                    , function(syncEvent){
+                        if (!eventExists){
+                            // insert
+                            var addEventReq = _.clone(req);
+                            addEventReq.body = {};
+                            addEventReq.body.Data = eventData.ion_count_average;
+                            addEventReq.body.CreateDate = moment(eventData.date).toISOString();
+                            addEventReq.body.Device = deviceId;
+                            eventController.addEvent(addEventReq, res, true, function (err, data, dataLength) {
+                                if (!err) {
+                                    console.log("Event Added");
+                                    syncEvent();
+                                }else{
+                                    syncEvent(err);
+                                }
+                            });
+                        }else{
+                            // update
+                            if (eventId){
+                                console.log(eventId);
+                                var updateEventReq = _.clone(req);
+                                updateEventReq.body = {};
+                                updateEventReq.body.EventId = eventId;
+                                updateEventReq.body.Data = eventData.ion_count_average;
+                                eventController.updateEvent(updateEventReq, res, true, function (err, data, dataLength) {
+                                    if (!err) {
+                                        console.log("Event Updated");
+                                        syncEvent();
+                                    }else{
+                                        syncEvent(err);
+                                    }
+                                });
+                            }else{
+                                syncEvent();
+                            }
+                        }
+                    }
+                ], function(err){
+                    console.log(err);
+                    if (!err){
+                        eventDataSync();
+                    }else{
+                        eventDataSync(err);
+                    }
+                })
+            }, function(err){
+                if (!err){
+                    syncWithDatabase();
+                }else{
+                    syncWithDatabase(err);
+                }
+            })
         }
     ], function(err){
         if (err){

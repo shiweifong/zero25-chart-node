@@ -7,3 +7,6 @@
  *
  */
 eventController = _require('/routes/m-core/event');
+deviceController = _require('/routes/m-core/device');
+
+mEventController = _require('/routes/m-zero25/event');

@@ -4,7 +4,7 @@
 
 // set the environment
 process.env.NODE_ENV = 'production';
-appName = 'zero25chart';
+appName = 'zero25';
 reg = 'sg';
 
 _require = function(name) {
@@ -59,7 +59,7 @@ var environment = process.env.NODE_ENV
  * CUSTOM MODULES
  */
 var routes = require('./routes'),
-    mzero25chart = require('./routes/m-zero25-chart'),
+    mzero25 = require('./routes/m-zero25'),
     mcore = require('./routes/m-core'),
     mongoHelper = _require('/helpers/mongo');
 
@@ -126,8 +126,8 @@ app.get('/', routes.index);
 // APIs
 app.get('/mcore/:base/:api', mcore);
 app.post('/mcore/:base/:api', mcore);
-app.get('/mzero25/:base/:api', mzero25chart);
-app.post('/mzero25/:base/:api', mzero25chart);
+app.get('/mzero25/:base/:api', mzero25);
+app.post('/mzero25/:base/:api', mzero25);
 
 /**
  * APP RELATED FUNCTIONS

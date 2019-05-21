@@ -10,23 +10,37 @@ var getEvent = exports.getEvent = function(req, res, override, callback, apiOpti
     var totalSizeCount = null;
     var pageSize = null;
     var skipSize = null;
+    var startDateTime = null;
+    var endDateTime = null;
 
     var queryParms = {};
 
     //key parameters
     if (req.query.EventId) queryParms._id = req.query.EventId;
-    if (req.query.Ion) queryParms.ion = req.query.Ion;
+    if (req.query.CreateDate) queryParms.create_date = req.query.CreateDate;
 
     //paging parameters
     if (req.query.PageSize && !isNaN(req.query.PageSize)) pageSize = parseInt(req.query.PageSize);
     if (req.query.TotalSizeCount) totalSizeCount = req.query.TotalSizeCount;
     if (req.query.PageSize && !isNaN(req.query.SkipSize)) skipSize = parseInt(req.query.SkipSize);
 
+    //additional parameters
+    if (req.query.StartDateTime) startDateTime = req.query.StartDateTime;
+    if (req.query.EndDateTime) endDateTime = req.query.EndDateTime;
+    if (startDateTime && endDateTime){
+        var createDateRange = {};
+        createDateRange.$gte = moment.utc(startDateTime).toISOString();
+        createDateRange.$lt  = moment.utc(endDateTime).toISOString();
+        queryParms.create_date = createDateRange;
+    }
+
     //additional options
     var options = {};
     if (apiOptions){
         options = apiOptions;
     }
+
+
     //sort options
     var sort = {};
     if (options.sort) sort = options.sort;
@@ -70,44 +84,92 @@ var getEvent = exports.getEvent = function(req, res, override, callback, apiOpti
 // Generic add method for event
 // Authorized - Admin, System Admin
 var addEvent = exports.addEvent = function(req, res, override, callback){
+    var addParms = {};
+
+    //default values
+    addParms.create_date = dateTimeHelper.utcNow();
+
+    //parameter values
+    if (req.body.Data) addParms.data = req.body.Data;
+    if (req.body.Device) addParms.device = req.body.Device;
+    if (req.body.CreateDate) addParms.create_date = req.body.CreateDate;
+
+    var newEventObj = null;
+    var newEventId = null;
+    var eventModel =  mongoose.model('event');
+    async.waterfall([
+        function(addEventCallback){
+            //add the event
+            var newEvent = new eventModel(addParms);
+            //add the new event
+            newEvent.save(function (err, data) {
+                if (!err && data){
+                    newEventObj = data;
+                    newEventId = data._id;
+                    addEventCallback();
+                }else{
+                    addEventCallback(err);
+                }
+            });
+        }
+    ], function (err) {
+        if (err){
+            apiHelper.addRes(req, res, err, null, callback);
+        }else{
+            apiHelper.addRes(req, res, null, newEventObj, callback);
+        }
+    });
+};
+
+
+// Generic update method for event 
+// Authorized - Admin, System Admin
+var updateEvent = exports.updateEvent = function(req, res, override, callback){
     if (
-        req.body.Entity
+        req.body.EventId
     ) {
-        var addParms = {};
+        //Querying Object
+        var queryParms = {};
+        if (req.body.EventId) queryParms._id = req.body.EventId;
+
+        //Editing Object
+        var updateParms = {};
 
         //default values
-        addParms.create_date = dateTimeHelper.utcNow();
 
         //parameter values
-        if (req.body.Ion) addParms.ion = req.body.Ion;
-        if (req.body.DeviceId) addParms.device = req.body.DeviceId;
-        if (req.body.CreateDate) addParms.create_date = req.body.CreateDate;
+        if (req.body.Data) updateParms.data = req.body.Data;
 
-        var newEventObj = null;
-        var newEventId = null;
-        var eventModel =  mongoose.model('event');
+        //unset features
+
+        //final check on unset to prevent errors
+        var updateEventObj = null;
+        var eventModel = mongoose.model('event');
         async.waterfall([
-            function(addEventCallback){
-                //add the event
-                var newEvent = new eventModel(addParms);
-                //add the new event
-                newEvent.save(function (err, data) {
-                    if (!err && data){
-                        newEventObj = data;
-                        newEventId = data._id;
-                        addEventCallback();
-                    }else{
-                        addEventCallback(err);
-                    }
-                });
-            }
-        ], function (err) {
-            if (err){
-                apiHelper.addRes(req, res, err, null, callback);
-            }else{
-                apiHelper.addRes(req, res, null, newEventObj, callback);
-            }
-        });
+                function (updateEventCallback) {
+                    //update enterprise
+                    eventModel.update(
+                        queryParms
+                        , updateParms
+                        , {multi: true}
+                        , function (err, data) {
+                            if (!err && data) {
+                                updateEventObj = data;
+                                updateEventCallback();
+                            } else {
+                                updateEventCallback(err);
+                            }
+                        });
+                }]
+            , function (err) {
+                if (err) {
+                    apiHelper.updateRes(req, res, err, null, null, callback);
+                } else {
+                    var numberAffected = null;
+                    if (updateEventObj) numberAffected = updateEventObj.nModified;
+                    apiHelper.updateRes(req, res, null, updateEventObj, numberAffected, callback);
+                }
+            });
     } else {
         apiHelper.apiResponse(req, res, true, 500, "Not found", null, null, null, callback);
     }
