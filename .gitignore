@@ -10,6 +10,7 @@
 
 # Custom
 node_modules
+data
 
 # PHP Storm
 .idea

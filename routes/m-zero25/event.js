@@ -76,6 +76,7 @@ var syncEventsFromDirectory= exports.syncEventsFromDirectory = function(req, res
                 var ion = file.substr(1, 4);
                 var date = file.substr(5);
                 date = date.trim();
+                console.log('Reading data from ' + date);
                 date = moment(moment(date).format("YYYY-MM-DDTHH:mm:ss") + moment.tz(moment(), "Asia/Singapore").format("Z")).toISOString();
                 var day = moment(date).format("YYYY-MM-DD");
                 var hour = parseInt(moment(date).format("HH"));
@@ -233,7 +234,6 @@ var syncEventsFromDirectory= exports.syncEventsFromDirectory = function(req, res
                         }
                     }
                 ], function(err){
-                    console.log(err);
                     if (!err){
                         eventDataSync();
                     }else{
